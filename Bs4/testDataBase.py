@@ -12,12 +12,25 @@ conn = pymysql.connect(
 #创建游标
 cur = conn.cursor()
 
-#解析数据
-cur.execute("select * from museum")
+# 读取文件
 
-result = cur.fetchall()
+file = open("museumUrl.txt", 'r', encoding='utf-8')
 
-print(result)
+list = file.readlines()
 
+for urlName in list:
+    urlName = urlName.split(' ')
+    url = urlName[1]
+    name = urlName[0]
+    sql = 'update museum set url=\'' + url[0:-1] + '\' where museumName=\'' + name + '\''
+    try:
+        cur.execute(sql)
+        conn.commit()
+        print("yes")
+    except:
+        print("error:" + sql)
+        conn.rollback()
+
+file.close()
 cur.close()
 conn.close()

@@ -32,20 +32,20 @@ for table in doc.find_all('tr'):
         file1.write(str(info) + "\n")
         file2.write(info[0] + "\n")
         # insert into museum values(id, name, type, rank, open, location)
-        # sen = "insert into museum values('" + str(id) + "'"
-        # for i in info:
-        #     if i == "是" or i == "否":
-        #         if i == "是": i = '1'
-        #         else : i = '0'
-        #     sen = sen + ',\'' + i + '\''
-        # sen = sen + ')'
-        # id += 1
-        # try:
-        #     cur.execute(sen)
-        #     conn.commit()
-        # except:
-        #     print("error:" + sen)
-        #     conn.rollback()
+        sen = "insert into museum values('" + str(id) + "'"
+        for i in info:
+            if i == "是" or i == "否":
+                if i == "是": i = '1'
+                else : i = '0'
+            sen = sen + ',\'' + i + '\''
+        sen = sen + ')'
+        id += 1
+        try:
+            cur.execute(sen)
+            conn.commit()
+        except:
+            print("error:" + sen)
+            conn.rollback()
 
 file2.close()
 cur.close()

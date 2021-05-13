@@ -30,6 +30,22 @@ urlHead = "https://baike.baidu.com/item/"
 #     print(info['馆藏精品'])
 
 
+# 连接数据库
+
+conn = pymysql.connect(
+    host = 'localhost',
+    user = 'root',
+    password = 'wtt0621',
+    db = 'spider',
+    charset='utf8'
+)
+
+#语句解析器
+
+cur = conn.cursor()
+
+# 爬取信息并处理
+
 file = open('museumName.txt', 'r')
 filew = open('museumInfo.txt', 'w')
 museumList = file.read()
@@ -54,7 +70,50 @@ for museum in museumList:
                 value = i
                 info[key] = value
             fl += 1
+        
+        # info为信息字典，从中获——‘馆藏精品’，‘开放时间’，‘联系电话’
+        # 对应数据库字段，‘collectionInfo’，‘openTime’，‘telephone’
+        # 采用update语句更新信息
+        # update museum set telephone='***', collectionInfo='***',openTime='***'
+        # where museumName = '***'
+
+        sql = "update museum set "
+        sta = ""
+
+        if '官方电话' in info:
+            sta += "telephone='" + info['官方电话'] + "'"
         if '馆藏精品' in info:
-            print(museum + "的馆藏精品：" + info['馆藏精品'])
-            filew.write(museum + "的馆藏精品：" + info['馆藏精品'] + '\n')
+            if len(sta) > 0:
+                sta += ","
+            sta += "collectionInfo='" + info['馆藏精品'] + "'"
+        if '开放时间' in info:
+            if len(sta) > 0:
+                sta += ","
+            sta += "openTime='" + info['开放时间'] + "'"
+        if sta == "": continue
+        sql += sta + " where museumName='" + museum + "'"
+        try:
+            cur.execute(sql)
+            conn.commit()
+            print("yes!_" + museum)
+        except:
+            print("error:" + sql)
+            conn.rollback()
+
+        # # 数据筛选：
+        # if '馆藏精品' in info:
+        #     print(museum + "的馆藏精品：" + info['馆藏精品'])
+        #     filew.write(museum + "的馆藏精品：" + info['馆藏精品'] + '\n')
+        
+        # # 写入文件
+        # filew.write(str(info) + "\n")
+
+        # 访问时延，防止高速访问ip被封
         time.sleep(0.5)
+
+# 关闭文件流
+file.close()
+filew.close()
+# 关闭数据库
+cur.close()
+conn.close()
