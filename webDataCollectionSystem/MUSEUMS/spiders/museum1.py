@@ -2,6 +2,8 @@
 import scrapy
 from MUSEUMS.items import MuseumsItem #包含这个item类，必须设置
 
+# 故宫博物院
+
 class Musume1Spider(scrapy.Spider):
     name = 'museum1'
     allowed_domains = ['dpm.org.cn']
